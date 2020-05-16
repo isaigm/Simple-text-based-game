@@ -46,7 +46,7 @@ fn update_msg(messages: &Vec<String>, curr_msg : &mut String, msg: usize, idx: u
 }
 fn main() {
     let mut messages : Vec<String> = vec!();
-    if let Ok(lines) = read_lines("../../vanilla.nki") {
+    if let Ok(lines) = read_lines("vanilla.nki") {
         // Consumes the iterator, returns an (Optional) String
         for line in lines {
             if let Ok(ip) = line {
@@ -56,7 +56,10 @@ fn main() {
     }
     let mut player = Character::new(2, 2, to_u32('@'), 0, 0);
     let mut population: [Character; 23] = [Default::default(); SIZE];
-    let chars: [u32; SIZE] = [to_u32('3'), to_u32('4'), to_u32('7'), to_u32('8'), to_u32('V'), to_u32('H'), to_u32('N'), to_u32('Y'), to_u32('S'), to_u32('k'), to_u32('x'), to_u32('e'), to_u32('q'), to_u32('m'),to_u32('o'),to_u32('u'), to_u32('*'), to_u32('.'), to_u32(';'), to_u32('-'), to_u32('/'), to_u32('!'), to_u32(']')];
+    let chars: [u32; SIZE] = [to_u32('3'), to_u32('4'), to_u32('7'), to_u32('8'), to_u32('V'), 
+    to_u32('H'), to_u32('N'), to_u32('Y'), to_u32('S'), to_u32('k'), to_u32('x'), to_u32('e'), 
+    to_u32('q'), to_u32('m'),to_u32('o'),to_u32('u'), to_u32('*'), to_u32('.'), to_u32(';'), 
+    to_u32('-'), to_u32('/'), to_u32('!'), to_u32(']')];
     initscr();
     noecho();   
     curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
@@ -96,7 +99,8 @@ fn main() {
     loop{
         wclear(win);
         wclear(message);
-        wborder(win, to_u32('|') , to_u32('|'), to_u32('-'), to_u32('-'), to_u32('+'), to_u32('+'), to_u32('+'), to_u32('+'));
+        wborder(win, to_u32('|') , to_u32('|'), to_u32('-'), to_u32('-'), to_u32('+'), to_u32('+'), 
+        to_u32('+'), to_u32('+'));
         for i in 0..SIZE{
             wattr_on(win, COLOR_PAIR(population[i].color));
             mvwaddch(win, population[i].y, population[i].x, population[i].ch);
