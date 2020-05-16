@@ -37,6 +37,13 @@ fn collide(x: i32, y: i32, population: &[Character; SIZE]) -> Option<(usize, usi
     }
     None
 }
+fn update_msg(messages: &Vec<String>, curr_msg : &mut String, msg: usize, idx: usize, kitten: usize){
+    if idx == kitten{
+        *curr_msg = String::from("You win");
+    }else{
+        *curr_msg = messages[msg].clone();
+    }
+}
 fn main() {
     let mut messages : Vec<String> = vec!();
     if let Ok(lines) = read_lines("../../vanilla.nki") {
@@ -104,13 +111,7 @@ fn main() {
             KEY_LEFT => {
                 if is_colliding_with(&win, player.x - 1, player.y){
                     match collide(player.x - 1, player.y, &population){
-                        Some((msg, i)) => {
-                            if i == kitten{
-                                curr_msg = String::from("You win");
-                            }else{
-                                curr_msg = messages[msg].clone()
-                            }
-                        },
+                        Some((msg, idx)) => update_msg(&messages, &mut curr_msg, msg, idx, kitten),
                         None => ()
                     }
                 }else{
@@ -120,13 +121,7 @@ fn main() {
             KEY_RIGHT => {
                 if is_colliding_with(&win, player.x + 1, player.y){
                     match collide(player.x + 1, player.y, &population){
-                        Some((msg, i)) => {
-                            if i == kitten{
-                                curr_msg = String::from("You win");
-                            }else{
-                                curr_msg = messages[msg].clone()
-                            }
-                        },
+                        Some((msg, idx)) => update_msg(&messages, &mut curr_msg, msg, idx, kitten),
                         None => ()
                     }
                 }else{
@@ -136,13 +131,7 @@ fn main() {
             KEY_UP => {
                 if is_colliding_with(&win, player.x, player.y - 1){
                     match collide(player.x, player.y - 1, &population){
-                        Some((msg, i)) => {
-                            if i == kitten{
-                                curr_msg = String::from("You win");
-                            }else{
-                                curr_msg = messages[msg].clone()
-                            }
-                        },
+                        Some((msg, idx)) => update_msg(&messages, &mut curr_msg, msg, idx, kitten),
                         None => ()
                     }
                 }else{
@@ -152,13 +141,7 @@ fn main() {
             KEY_DOWN => {
                 if is_colliding_with(&win, player.x, player.y + 1){
                     match collide(player.x, player.y + 1, &population){
-                        Some((msg, i)) => {
-                            if i == kitten{
-                                curr_msg = String::from("You win");
-                            }else{
-                                curr_msg = messages[msg].clone()
-                            }
-                        },
+                        Some((msg, idx)) => update_msg(&messages, &mut curr_msg, msg, idx, kitten),
                         None => ()
                     }
                 }else{
