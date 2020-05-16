@@ -4,6 +4,7 @@ use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 
+const SIZE: usize= 23;
 #[derive(Default, Copy, Clone)]
 struct Character{
     x: i32,
@@ -28,6 +29,14 @@ where P: AsRef<Path>, {
     let file = File::open(filename)?;
     Ok(io::BufReader::new(file).lines())
 }
+fn collide(x: i32, y: i32, population: &[Character; SIZE]) -> Option<(usize, usize)>{
+    for i in 0..SIZE{
+        if population[i].x == x && population[i].y == y{
+            return Some((population[i].msg, i));
+        }
+    }
+    None
+}
 fn main() {
     let mut messages : Vec<String> = vec!();
     if let Ok(lines) = read_lines("../../vanilla.nki") {
@@ -38,7 +47,6 @@ fn main() {
             }
         }
     }
-    const SIZE: usize= 23;
     let mut player = Character::new(2, 2, to_u32('@'), 0, 0);
     let mut population: [Character; 23] = [Default::default(); SIZE];
     let chars: [u32; SIZE] = [to_u32('3'), to_u32('4'), to_u32('7'), to_u32('8'), to_u32('V'), to_u32('H'), to_u32('N'), to_u32('Y'), to_u32('S'), to_u32('k'), to_u32('x'), to_u32('e'), to_u32('q'), to_u32('m'),to_u32('o'),to_u32('u'), to_u32('*'), to_u32('.'), to_u32(';'), to_u32('-'), to_u32('/'), to_u32('!'), to_u32(']')];
@@ -59,6 +67,7 @@ fn main() {
     getmaxyx(stdscr(), &mut rows, &mut cols);
     let win : WINDOW = newwin(rows - 3, cols, 3, 0);
     let message : WINDOW = newwin(3, cols, 0, 0);
+    let kitten = Uniform::from(0..SIZE).sample(&mut rng);
     keypad(win, true);
     for i in 0..SIZE{
         let n1 = Uniform::from(1..cols-1);
@@ -71,15 +80,15 @@ fn main() {
 
         }
         let color = Uniform::from(1..7);
-        population[i] = Character::new(x, y, chars[i], color.sample(&mut rng));
+        let msg = Uniform::from(0..messages.len());
+        population[i] = Character::new(x, y, chars[i], color.sample(&mut rng), msg.sample(&mut rng));
     }
-    let curr_msg : String = String::from("The most bored game");
+    let mut curr_msg : String = String::from("The most bored game");
     mvwaddstr(message, 1, 0, curr_msg.as_str());
     wrefresh(message);
     loop{
         wclear(win);
         wclear(message);
-        mvwaddstr(message, 1, 0, curr_msg.as_str());
         wborder(win, to_u32('|') , to_u32('|'), to_u32('-'), to_u32('-'), to_u32('+'), to_u32('+'), to_u32('+'), to_u32('+'));
         for i in 0..SIZE{
             wattr_on(win, COLOR_PAIR(population[i].color));
@@ -93,27 +102,72 @@ fn main() {
         match ch{
             27 => break,
             KEY_LEFT => {
-                if !is_colliding_with(&win, player.x - 1, player.y){
+                if is_colliding_with(&win, player.x - 1, player.y){
+                    match collide(player.x - 1, player.y, &population){
+                        Some((msg, i)) => {
+                            if i == kitten{
+                                curr_msg = String::from("You win");
+                            }else{
+                                curr_msg = messages[msg].clone()
+                            }
+                        },
+                        None => ()
+                    }
+                }else{
                     player.x -= 1;
                 }
             },
             KEY_RIGHT => {
-                if !is_colliding_with(&win, player.x + 1, player.y){
+                if is_colliding_with(&win, player.x + 1, player.y){
+                    match collide(player.x + 1, player.y, &population){
+                        Some((msg, i)) => {
+                            if i == kitten{
+                                curr_msg = String::from("You win");
+                            }else{
+                                curr_msg = messages[msg].clone()
+                            }
+                        },
+                        None => ()
+                    }
+                }else{
                     player.x += 1;
                 }
             },
             KEY_UP => {
-                if !is_colliding_with(&win, player.x, player.y - 1){
+                if is_colliding_with(&win, player.x, player.y - 1){
+                    match collide(player.x, player.y - 1, &population){
+                        Some((msg, i)) => {
+                            if i == kitten{
+                                curr_msg = String::from("You win");
+                            }else{
+                                curr_msg = messages[msg].clone()
+                            }
+                        },
+                        None => ()
+                    }
+                }else{
                     player.y -= 1;
                 }
             },
             KEY_DOWN => {
-                if !is_colliding_with(&win, player.x, player.y + 1){
+                if is_colliding_with(&win, player.x, player.y + 1){
+                    match collide(player.x, player.y + 1, &population){
+                        Some((msg, i)) => {
+                            if i == kitten{
+                                curr_msg = String::from("You win");
+                            }else{
+                                curr_msg = messages[msg].clone()
+                            }
+                        },
+                        None => ()
+                    }
+                }else{
                     player.y += 1;
                 }
             },
             _ => () 
         }
+        mvwaddstr(message, 1, 0, curr_msg.as_str());
         wrefresh(win);
         wrefresh(message);
     }
